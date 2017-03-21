@@ -102,14 +102,14 @@ class BaseNyamuk:
         
         while len(self.out_packet) > 0:
             pkt = self.out_packet[0]
-            write_length, status = nyamuk_net.write(self.sock, pkt.payload)
+            write_length, status = nyamuk_net.write(self.sock, pkt.payload[pkt.pos:])
             if write_length > 0:
                 pkt.to_process -= write_length
                 pkt.pos += write_length
-                
+
                 bytes_written += write_length
-                
                 if pkt.to_process > 0:
+                    self.packet_write()
                     return NC.ERR_SUCCESS, bytes_written
             else:
                 if status == errno.EAGAIN or status == errno.EWOULDBLOCK:
